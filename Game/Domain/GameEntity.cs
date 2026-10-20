@@ -1,19 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Game.Domain
 {
     public class GameEntity
     {
+        [BsonElement]
         private readonly List<Player> players;
 
         public GameEntity(int turnsCount)
-            : this(Guid.Empty, GameStatus.WaitingToStart, turnsCount, 0, new List<Player>())
-        {
-        }
+            : this(Guid.Empty, GameStatus.WaitingToStart, turnsCount, 0, new List<Player>()) { }
 
-        public GameEntity(Guid id, GameStatus status, int turnsCount, int currentTurnIndex, List<Player> players)
+        [BsonConstructor]
+        public GameEntity(
+            Guid id,
+            GameStatus status,
+            int turnsCount,
+            int currentTurnIndex,
+            List<Player> players
+        )
         {
             Id = id;
             Status = status;
@@ -22,6 +29,7 @@ namespace Game.Domain
             this.players = players;
         }
 
+        [BsonElement]
         public Guid Id
         {
             get;
@@ -31,10 +39,13 @@ namespace Game.Domain
 
         public IReadOnlyList<Player> Players => players.AsReadOnly();
 
+        [BsonElement]
         public int TurnsCount { get; }
 
+        [BsonElement]
         public int CurrentTurnIndex { get; private set; }
 
+        [BsonElement]
         public GameStatus Status { get; private set; }
 
         public void AddPlayer(UserEntity user)
@@ -49,8 +60,8 @@ namespace Game.Domain
         public bool IsFinished()
         {
             return CurrentTurnIndex >= TurnsCount
-                   || Status == GameStatus.Finished
-                   || Status == GameStatus.Canceled;
+                || Status == GameStatus.Finished
+                || Status == GameStatus.Canceled;
         }
 
         public void Cancel()
